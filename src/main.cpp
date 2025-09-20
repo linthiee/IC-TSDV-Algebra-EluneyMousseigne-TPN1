@@ -20,7 +20,7 @@ struct Polygon
 struct Cursor
 {
 	float radius = 5.0f;
-	Vector2 position;
+	Vector2 position = { 0.0f, 0.0f };
 };
 
 float Distance(Vector2 a, Vector2 b);
@@ -47,6 +47,7 @@ int main()
 	polygons.push_back(Polygon());
 
 	Polygon* selectedPolygon = nullptr;
+	bool canDraw = true;
 
 	while (!WindowShouldClose())
 	{
@@ -57,9 +58,10 @@ int main()
 
 		cursor.position = mouse;
 
-		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+		if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && canDraw)
 		{
 			Polygon& currentPoly = polygons.back();
+
 			if (currentPoly.lines.empty())
 			{
 				Line currentline;
@@ -127,10 +129,12 @@ int main()
 			if (selectedPolygon == nullptr)
 			{
 				selectedPolygon = polygonSelected(cursor, polygons);
+				canDraw = false;
 			}
 			else
 			{
 				selectedPolygon = nullptr;
+				canDraw = true;
 			}
 		}
 
@@ -150,8 +154,10 @@ int main()
 		BeginDrawing();
 		ClearBackground(BLACK);
 
-		for (Polygon& poly : polygons)
+		for (int p = 0; p < polygons.size(); p++)
 		{
+			Polygon& poly = polygons[p];
+
 			if (poly.latestPoint.x != numeric_limits<float>::max() && poly.latestPoint.y != numeric_limits<float>::max())
 			{
 				for (int i = 0; i < poly.lines.size(); i++)
@@ -159,16 +165,18 @@ int main()
 					DrawLineV(poly.lines[i].init, poly.lines[i].end, WHITE);
 				}
 			}
-			for (Line& v : poly.lines)
+
+			for (int v = 0; v < poly.lines.size(); v++)
 			{
-				DrawCircleV(v.init, 4, YELLOW);
+				DrawCircleV(poly.lines[v].init, 4, YELLOW);
 
 				if (poly.latestPoint.x != numeric_limits<float>::max() && poly.latestPoint.y != numeric_limits<float>::max())
 				{
-					DrawCircleV(v.end, 4, YELLOW);
+					DrawCircleV(poly.lines[v].end, 4, YELLOW);
 				}
 			}
 		}
+
 		for (int i = 0; i < polygons.size(); i++)
 		{
 			for (int j = 0; j < polygons.size(); j++)
@@ -248,6 +256,7 @@ Polygon* polygonSelected(Cursor cursor, vector<Polygon>& polygons)
 			}
 		}
 	}
+
 	return nullptr;
 }
 
