@@ -54,8 +54,6 @@ int main()
 
 	while (!WindowShouldClose())
 	{
-		cout << polygons.size() << endl;
-
 		if (IsKeyPressed(KEY_R))
 		{
 			polygons.clear();
