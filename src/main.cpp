@@ -49,8 +49,17 @@ int main()
 	Polygon* selectedPolygon = nullptr;
 	bool canDraw = true;
 
+	string text = "Presione R para limpiar la pantalla";
+	const int TEXT_SIZE = 24;
+
 	while (!WindowShouldClose())
 	{
+		if (IsKeyPressed(KEY_R))
+		{
+			polygons.clear();
+			polygons.push_back(Polygon());
+		}
+
 		lastMousePos = mouse;
 		mouse = GetMousePosition();
 
@@ -95,11 +104,11 @@ int main()
 							hasCollision = true;
 						}
 					}
+
 					if (!hasCollision)
 					{
 						if (Distance(mouse, firstVertex) < 50.0f)
 						{
-							//currentPoly.latestPoint = firstVertex;
 							currentPoly.closed = true;
 							currentline.end = firstVertex;
 							currentPoly.latestPoint = currentline.end;
@@ -142,7 +151,6 @@ int main()
 		{
 			for (int i = 0; i < (*selectedPolygon).lines.size(); i++)
 			{
-
 				(*selectedPolygon).lines[i].init.x += deltaMouse.x;
 				(*selectedPolygon).lines[i].init.y += deltaMouse.y;
 
@@ -201,6 +209,8 @@ int main()
 			}
 		}
 
+		DrawText(text.c_str(), (GetScreenWidth() / 2) - MeasureText(text.c_str(), TEXT_SIZE) / 2, GetScreenHeight() - 30, TEXT_SIZE, YELLOW);
+
 		EndDrawing();
 	}
 
@@ -216,7 +226,7 @@ float Distance(Vector2 a, Vector2 b)
 	return sqrtf((dx * dx) + (dy * dy));
 }
 
-bool lineToLineIntersection(Vector2 poly1Init, Vector2 poly1End, Vector2 poly2Init, Vector2 poly2End, Vector2& point) //poly1Init = x1,y1, polyEnd = x2, y2, poly2Init = x3,y3, polyEnd = x4,y4
+bool lineToLineIntersection(Vector2 poly1Init, Vector2 poly1End, Vector2 poly2Init, Vector2 poly2End, Vector2& point)
 {
 	float a1 = poly1End.y - poly1Init.y;
 	float b1 = poly1Init.x - poly1End.x;
