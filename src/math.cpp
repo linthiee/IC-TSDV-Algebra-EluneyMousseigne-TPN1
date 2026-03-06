@@ -10,16 +10,18 @@ float Distance(Vector2 a, Vector2 b)
 
 bool lineToLineIntersection(Vector2 poly1Init, Vector2 poly1End, Vector2 poly2Init, Vector2 poly2End, Vector2& point)
 {
+	//get the line line equation (Ax + By = C) X2
 	float a1 = poly1End.y - poly1Init.y;
 	float b1 = poly1Init.x - poly1End.x;
 	float c1 = a1 * poly1Init.x + b1 * poly1Init.y;
 	float a2 = poly2End.y - poly2Init.y;
 	float b2 = poly2Init.x - poly2End.x;
 	float c2 = a2 * poly2Init.x + b2 * poly2Init.y;
-	float determinante = a1 * b2 - a2 * b1;
+	float determinante = a1 * b2 - a2 * b1; //calculate determinant (sin of the angle)
 
-	if (determinante != 0)
+	if (determinante != 0) //if they arent paralell
 	{
+		//cramer's rule to see were they potentially collide
 		float x = (b2 * c1 - b1 * c2) / determinante;
 		float y = (a1 * c2 - a2 * c1) / determinante;
 		point.x = x;
@@ -27,7 +29,7 @@ bool lineToLineIntersection(Vector2 poly1Init, Vector2 poly1End, Vector2 poly2In
 		if (x >= std::min(poly1Init.x, poly1End.x) && x <= std::max(poly1Init.x, poly1End.x) &&
 			x >= std::min(poly2Init.x, poly2End.x) && x <= std::max(poly2Init.x, poly2End.x) &&
 			y >= std::min(poly1Init.y, poly1End.y) && y <= std::max(poly1Init.y, poly1End.y) &&
-			y >= std::min(poly2Init.y, poly2End.y) && y <= std::max(poly2Init.y, poly2End.y))
+			y >= std::min(poly2Init.y, poly2End.y) && y <= std::max(poly2Init.y, poly2End.y)) //check if the points are indeed in the limits of each line
 			return true;
 	}
 	return false;
@@ -39,6 +41,7 @@ bool checkCollisionPointCircle(Vector2 circlePos, Vector2 pointPos, float radius
 	float distY = pointPos.y - circlePos.y;
 	float distance = sqrt((distX * distX) + (distY * distY));
 
+	//pytaghoras using the distance to the point to the circle in x and y
 	if (distance <= radius)
 	{
 		return true;
@@ -58,11 +61,11 @@ bool checkCollisionLineCircle(Vector2 circlePos, Vector2 pointPos1, Vector2 poin
 
 	float distX = pointPos1.x - pointPos2.x;
 	float distY = pointPos1.y - pointPos2.y;
-	float len = sqrt((distX * distX) + (distY * distY));
+	float len = sqrt((distX * distX) + (distY * distY)); //get the line magnitude
 
 	float dot = (((circlePos.x - pointPos1.x) * (pointPos2.x - pointPos1.x)) + ((circlePos.y - pointPos1.y) * (pointPos2.y - pointPos1.y))) / pow(len, 2);
 
-	Vector2 closests = { pointPos1.x + dot * (pointPos2.x - pointPos1.x), pointPos1.y + dot * (pointPos2.y - pointPos1.y) };
+	Vector2 closests = { pointPos1.x + dot * (pointPos2.x - pointPos1.x), pointPos1.y + dot * (pointPos2.y - pointPos1.y) }; //point of the projection 
 
 	bool onSegment = linePoint(pointPos1, pointPos2, closests);
 
