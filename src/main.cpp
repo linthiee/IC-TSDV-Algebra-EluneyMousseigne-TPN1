@@ -31,8 +31,8 @@ void Draw(std::vector<Polygon>& polygons, std::string& text, const int TEXT_SIZE
 void drawPoly(std::vector<Polygon>& polygons);
 void drawCollisionPoint(std::vector<Polygon>& polygons);
 
-void Update(std::vector<Polygon>& polygons, Vector2& lastMousePos, Vector2& mouse, Cursor& cursor, bool& canDraw, Polygon*& selectedPolygon);
-void movePoly(Polygon*& selectedPolygon, Cursor& cursor, std::vector<Polygon>& polygons, bool& canDraw, Vector2& deltaMouse);
+void Update(std::vector<Polygon>& polygons, Vector2& lastMousePos, Vector2& mouse, Cursor& cursor, bool& canDraw, bool& canMove, Polygon*& selectedPolygon);
+void movePoly(Polygon*& selectedPolygon, Cursor& cursor, std::vector<Polygon>& polygons, bool& canDraw, bool& canMove, Vector2& deltaMouse);
 
 int main()
 {
@@ -50,13 +50,14 @@ int main()
 
 	Polygon* selectedPolygon = nullptr;
 	bool canDraw = true;
+	bool canMove = true;
 
 	string text = "Presione R para limpiar la pantalla";
 	const int textSize = 24;
 
 	while (!WindowShouldClose())
 	{
-		Update(polygons, lastMousePos, mouse, cursor, canDraw, selectedPolygon);
+		Update(polygons, lastMousePos, mouse, cursor, canDraw, canMove, selectedPolygon);
 		Draw(polygons, text, textSize);
 	}
 
@@ -64,7 +65,7 @@ int main()
 	return 0;
 }
 
-void Update(std::vector<Polygon>& polygons, Vector2& lastMousePos, Vector2& mouse, Cursor& cursor, bool& canDraw, Polygon*& selectedPolygon)
+void Update(std::vector<Polygon>& polygons, Vector2& lastMousePos, Vector2& mouse, Cursor& cursor, bool& canDraw, bool& canMove, Polygon*& selectedPolygon)
 {
 	BeginDrawing();
 	ClearBackground(BLACK);
@@ -84,6 +85,8 @@ void Update(std::vector<Polygon>& polygons, Vector2& lastMousePos, Vector2& mous
 
 	if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON) && canDraw)
 	{
+		canMove = false;
+
 		Polygon& currentPoly = polygons.back();
 
 		if (currentPoly.lines.empty())
@@ -129,6 +132,8 @@ void Update(std::vector<Polygon>& polygons, Vector2& lastMousePos, Vector2& mous
 						currentPoly.latestPoint = currentline.end;
 						currentPoly.lines.push_back(currentline);
 						polygons.push_back(Polygon());
+
+						canMove = true;
 					}
 					else
 					{
@@ -148,12 +153,12 @@ void Update(std::vector<Polygon>& polygons, Vector2& lastMousePos, Vector2& mous
 		}
 	}
 
-	movePoly(selectedPolygon, cursor, polygons, canDraw, deltaMouse);
+	movePoly(selectedPolygon, cursor, polygons, canDraw, canMove, deltaMouse);
 }
 
-void movePoly(Polygon*& selectedPolygon, Cursor& cursor, std::vector<Polygon>& polygons, bool& canDraw, Vector2& deltaMouse)
+void movePoly(Polygon*& selectedPolygon, Cursor& cursor, std::vector<Polygon>& polygons, bool& canDraw, bool& canMove, Vector2& deltaMouse)
 {
-	if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON))
+	if (IsMouseButtonPressed(MOUSE_RIGHT_BUTTON) && canMove)
 	{
 		if (selectedPolygon == nullptr)
 		{
